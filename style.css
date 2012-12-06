@@ -62,6 +62,7 @@ div.emacsConsole {
 	font-family: monospace !important;
 	padding: 2px 5px !important;
 	z-index: 1200 !important;
+  ime-mode: inactive;
 }
 div.emacsConsole *, div.emacsConsole a {
 	color: white !important;

@@ -43,8 +43,11 @@ var shortcuts = {
 	'CTRL-R': {'h': 'Reverse I-search links', 'f': function(e) { searchLinks(e, 0) } },
 	'CTRL-ALT-R': {'h': 'Reverse regexp I-search links', 'f': function(e) { searchLinks(e, 1) } },
 	'CTRL-J': {'h': 'Jump to link or form control', 'f': function(e) { jumpTo(e) } },
+        'CTRL-M': {'h': 'Enter',  'f': function(e) { log("Hmm.. How did you get here?") } },
 	// native functions
 	'BACKSPACE': {'h': 'Previous page in history', 'f': function(e) { log("Hmm.. How did you get here?") } },
+	'CTRL-U': {'M': { 'h': 'Previous page in history', 'f': function(e) { log("Hmm.. How did you get here?") } } },
+	'ALT-U': {'h': 'Next page in history', 'f': function(e) { log("Hmm.. How did you get here?") } },
 	'CTRL-T': {'h': 'New tab', 'f': function(e) { chrome.extension.sendRequest({'action':'NEW_TAB'}) } },
 	'ESC': {'h': 'Remove focus from link or form control', 'f': function(e) { log("Hmm.. How did you get here?") } },
 	'CTRL-X': {
@@ -226,12 +229,21 @@ var keydownevent = function(e) {
 			return;
 		}
 		if (!enabled) return;
-		// backspace: page back
-		if (e.keyCode == 8) {
+		// backspace or ctrl-u: page back
+		if (e.keyCode == 8 || input == 'CTRL-U') {
 			if (e.preventDefault) e.preventDefault();
 			history.go(-1);
 			return;
 		}
+		// alt-u: page next
+		if (input == 'ALT-U') {
+			if (e.preventDefault) e.preventDefault();
+			history.go(1);
+			return;
+		}
+
+	// lets bind those items
+
 		// if no shortcut exist in first press,
 		// do default action
 		if (!shortcuts[input]) return;
@@ -291,7 +303,7 @@ var jumpTo = function(e) {
 	if (data.elms.length < 1) return;
 
 	// assign each element a label
-	var letters = ['A','B','C','D','E','F','G','H','I','J','K','L','O','M','N','P','Q','R','S','T','U','V','W','X','Y','Z'];
+	var letters = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'];
 	data.seqlen = Math.ceil(Math.log(data.elms.length)/Math.log(letters.length));
 	var key = [];
 	for (var i = 0; i < data.seqlen; ++i) key.push(0);
@@ -424,6 +436,7 @@ var searchLinks = function(e, reg) {
 			if (links.length > marked) links[marked].focus();
 			return readQuit();
 		}
+    
 		if (input == "CTRL-S" || input == "CTRL-ALT-S") {
 			if (e.stopPropagation) e.stopPropagation();
 			if (e.preventDefault) e.preventDefault();
@@ -537,6 +550,7 @@ var evalJS = function(e) {
 			}
 			break;
 		case 13: // enter
+			e.keyCode = 13;
 			if (e.stopPropagation) e.stopPropagation();
 			if (e.preventDefault) e.preventDefault();
 			try {
